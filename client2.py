@@ -158,14 +158,18 @@ class Box:
 			del(boxes[self.name])
 
 def listen(init):
+	sockets_list = [sys.stdin, server]
+	read_sockets, write_socket, error_socket = select.select(sockets_list,[],[])
 	while True:
 		evaluate_msg = " "
-		sockets_list = [sys.stdin, server]
-		read_sockets, write_socket, error_socket = select.select(sockets_list,[],[])
 
 		for socks in read_sockets:
 			if socks == server:
-				msgs = separate(socks.recv(2048).decode())
+				try:
+					msgs = separate(socks.recv(2048).decode())
+				except:
+					print("Connexion interrompue")
+					_thread.exit()
 				for msg in msgs:
 					if msg[0] == "[" and msg[-1] == "]":
 						evaluate_msg = eval(msg)
