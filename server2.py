@@ -80,6 +80,7 @@ class Client:
 							del(players[evaluate_msg[1]])
 						except:
 							print("Impossible to delete player called '" + evaluate_msg[1])
+						self.conn.close()
 						_thread.exit()
 
 def choose(param):
@@ -103,6 +104,5 @@ while run:
 	conn, addr = server.accept()
 	list_of_clients.append(Client(conn, addr))
 	print(addr[0], "is connected")
-    
-conn.close()
+
 server.close()
