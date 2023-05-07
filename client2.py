@@ -31,8 +31,8 @@ def draw(image, xy, centered = True):
 
 class Player:
 	def __init__(self, name, position, life, direction, skin, weapon):
-		self.position = position
 		self.name = name
+		self.position = position
 		self.life = life
 		self.direction = direction
 		self.dead = False
@@ -170,7 +170,10 @@ def listen(init):
 				except:
 					print("Connexion interrompue")
 					_thread.exit()
+
 				for msg in msgs:
+					print(msg)
+					
 					if msg[0] == "[" and msg[-1] == "]":
 						evaluate_msg = eval(msg)
 
