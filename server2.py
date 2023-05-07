@@ -37,8 +37,8 @@ def broadcast(msg, addr):
 
 class Player:
 	def __init__(self, name, position, life, direction, skin, weapon):
-		self.position = position
 		self.name = name
+		self.position = position
 		self.life = life
 		self.direction = direction
 		self.skin = skin
@@ -79,7 +79,7 @@ class Client:
 						try:
 							del(players[evaluate_msg[1]])
 						except:
-							print("Impossible to delete player called '" + evaluate_msg[1])
+							print("Impossible to delete player called '" + evaluate_msg[1] + "'")
 						self.conn.close()
 						_thread.exit()
 
