@@ -30,6 +30,10 @@ def broadcast(msg, addr):
 				list_of_clients[i].conn.send(bytes(msg, "utf-8"))
 			except:
 				print("Impossible to send to", list_of_clients[i].addr[0])
+				try:
+					broadcast(f"['@Leave', '{list_of_clients[i].name}']", list_of_clients[i].addr)
+				except:
+					pass
 				error.append(i)
 	for elt in error:
 		list_of_clients.pop(elt)
@@ -53,7 +57,14 @@ class Client:
 
 	def listen(self):
 		while True:
-			msg = self.conn.recv(2048).decode()
+			try:
+				msg = self.conn.recv(2048).decode()
+			except:
+				print("Connexion reset by " + addr[0])
+				self.delete(addr[0])
+				self.conn.close()
+				_thread.exit()
+
 			if len(msg) > 0:
 				msgs = separate(msg)
 				for elt in msgs:
@@ -74,14 +85,19 @@ class Client:
 							self.conn.send(bytes(str(['@Player', players[key].name, players[key].position, players[key].life, players[key].direction, players[key].skin, players[key].weapon.name]), "utf-8"))
 						players[evaluate_msg[1]] = Player(evaluate_msg[1], evaluate_msg[2], evaluate_msg[3], evaluate_msg[4], evaluate_msg[5], evaluate_msg[6])
 						self.conn.send(bytes("['@Go']", "utf-8"))
+						self.name = evaluate_msg[1]
 					
 					elif evaluate_msg[0] == "@Leave":
-						try:
-							del(players[evaluate_msg[1]])
-						except:
-							print("Impossible to delete player called '" + evaluate_msg[1] + "'")
+						self.delete(evaluate_msg[1])
 						self.conn.close()
 						_thread.exit()
+						
+	def delete(self, name):
+		try:
+			del(players[name])
+			print("Player named " + self.name + " is deleted")
+		except:
+			print("Impossible to delete player called '" + name + "'")
 
 def choose(param):
 	items_list = []
