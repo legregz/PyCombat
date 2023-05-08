@@ -9,17 +9,18 @@ from common import *
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-Name = input("entrez votre nom: ")
-Skin = input("entrez votre skin: ")
-
 if len(sys.argv) != 3:
 	print("Correct usage: IP, Port")
 	
 server.connect((str(sys.argv[1]), int(sys.argv[2])))
 
-global players, boxes
+Name = input("entrez votre nom: ")
+Skin = input("entrez votre skin: ")
+
+global players, boxes, messages
 players = {}
 boxes = {}
+messages = []
 
 def draw(image, xy, centered = True):
 	if centered == True:
@@ -52,10 +53,10 @@ class Player:
 				
 				screen.blit(self.texture, (self.position[0] - 16 + rand_x, self.position[1] - 16 + rand_y))
 				draw(font.render(self.name, True, (255,255,255)), (self.position[0] + rand_y, self.position[1] - 32 + rand_x))
-				pygame.draw.line(screen, (255, 0, 0), (self.position[0] - 20 + rand_y, self.position[1] - 22 + rand_x), (int(self.position[0] - 20 + self.life * 2 + rand_x), self.position[1] - 22 + rand_y), 4)
+				pygame.draw.line(screen, (255, 0, 0), (self.position[0] - 20 + rand_y, self.position[1] - 22 + rand_x), (int(self.position[0] - 20 + self.life + rand_x), self.position[1] - 22 + rand_y), 4)
 			else:
 				draw(font.render(self.name, True, (255,255,255)), (self.position[0], self.position[1] - 32))
-				pygame.draw.line(screen, (255, 0, 0), (self.position[0] - 20, self.position[1] - 22), (int(self.position[0] - 20 + self.life * 2), self.position[1] - 22), 4)
+				pygame.draw.line(screen, (255, 0, 0), (self.position[0] - 20, self.position[1] - 22), (int(self.position[0] - 20 + self.life), self.position[1] - 22), 4)
 				screen.blit(self.texture, (self.position[0] - 16, self.position[1] - 16))
 
 			if self.trace_time > time.time():
@@ -76,7 +77,7 @@ class Player:
 				pygame.draw.line(screen, (235, 235, 255), (self.position[0] + 30, self.position[1] // 3), (self.position[0] - 30, self.position[1] * 2 // 3), 5)
 				pygame.draw.line(screen, (235, 235, 255), (self.position[0] - 30, self.position[1] * 2 // 3), (self.position[0], self.position[1]), 4)
 			if self.name == Name:
-				draw(font2.render("Respawn in " + str(int(self.respawn_time - time.time())), True, (255,255,255)), (lenght // 2, width // 2))
+				draw(font3.render("Respawn in " + str(int(self.respawn_time - time.time())), True, (255,255,255)), (lenght // 2, width // 2))
 				if self.respawn_time <= time.time():
 					self.death(False)
 
@@ -172,8 +173,6 @@ def listen(init):
 					_thread.exit()
 
 				for msg in msgs:
-					print(msg)
-					
 					if msg[0] == "[" and msg[-1] == "]":
 						evaluate_msg = eval(msg)
 
@@ -213,23 +212,67 @@ def listen(init):
 						elif evaluate_msg[0] == "@Weapon":
 							players[evaluate_msg[1]].weapon = eval(evaluate_msg[2] + "()")
 							
+						
+						elif evaluate_msg[0] == "@Message":
+							messages.append(evaluate_msg[1])
+							
 						elif evaluate_msg[0] == "@Leave":
-							del(players[evaluate_msg[1]])
+							try:
+								del(players[evaluate_msg[1]])
+								print("Player named " + evaluate_msg[1] + " has been deleted")
+							except:
+								print("Player named " + evaluate_msg[1] + " is already deleted")
 						
 					if evaluate_msg[0] == "@Player":
 						players[evaluate_msg[1]] = Player(evaluate_msg[1], evaluate_msg[2], evaluate_msg[3], evaluate_msg[4], evaluate_msg[5], evaluate_msg[6])
 
 pygame.init()
-screen = pygame.display.set_mode((lenght, width))
+screen = pygame.display.set_mode((lenght + 200, width))
 pygame.display.set_caption("Combat")
 
 font = pygame.font.Font(".PyCombat/LiberationMono-Bold.ttf", 10)
-font2 = pygame.font.Font(".PyCombat/LiberationMono-Bold.ttf", 30)
+font3 = pygame.font.Font(".PyCombat/LiberationMono-Bold.ttf", 30)
 
 pygame.key.set_repeat(1, 30)
 
+def draw_chat():
+	for i in range(len(messages)):
+		screen.blit(font.render(messages[i], True, (255,255,255)), (lenght, i * 15))
+
+def chat():
+	label = font.render(":", True, (255,255,255))
+	user_text = ''
+	while True:
+		for event in pygame.event.get():
+			if event.type == pygame.QUIT:
+				pygame.quit()
+				
+			if event.type == pygame.KEYDOWN:
+				if event.key == pygame.K_BACKSPACE:
+					user_text = user_text[:-1]
+
+				else:
+					user_text += event.unicode
+					
+				if event.key == pygame.K_RETURN:
+					server.send(bytes(str(["@Message", "<" + Name + "> " + user_text[:-1]]), "utf-8"))
+					messages.append("<" + Name + "> " + user_text[:-1])
+					user_text =''
+					
+				if event.key == pygame.K_ESCAPE:
+					return ''
+		
+		pygame.draw.rect(screen, (25, 25, 25), (lenght, width - 20, 200, 20))
+		text = font.render(user_text, True, (255,255,255))
+		screen.blit(label, (lenght + 2, width - 20))
+		screen.blit(text, (lenght + 10, width - 20))
+		draw_chat()
+		
+		pygame.display.flip()
+		time.sleep(0.2)
+
 def menu():
-	players[Name] = Player(Name, [int(lenght / 2), int(width / 2)], 20, "bottom", Skin, "hand")
+	players[Name] = Player(Name, [int(lenght / 2), int(width / 2)], 40, "bottom", Skin, "hand")
 	_thread.start_new_thread(listen, (True,))
 	game()
 
@@ -250,21 +293,24 @@ def game():
 			if event.type == pygame.QUIT:
 				run = False
 			if event.type == pygame.KEYDOWN:
-				if pygame.key.get_pressed()[pygame.K_s]:
+				if event.key == pygame.K_s:
 					if players[Name].position[1] < width - 32:
 						move[1] = 10
 					
-				if pygame.key.get_pressed()[pygame.K_z]:
+				if event.key == pygame.K_z:
 					if players[Name].position[1] > 32:
 						move[1] = -10
 					
-				if pygame.key.get_pressed()[pygame.K_q]:
+				if event.key == pygame.K_q:
 					if players[Name].position[0] > 32:
 						move[0] = -10
 					
-				if pygame.key.get_pressed()[pygame.K_d]:
+				if event.key == pygame.K_d:
 					if players[Name].position[0] < lenght - 32:
 						move[0] = 10
+						
+				if event.key == pygame.K_COLON:
+					chat()
 					
 			if event.type == pygame.MOUSEBUTTONDOWN:
 				players[Name].attack()
@@ -275,6 +321,8 @@ def game():
 			players[Name].move(move)
 		screen.fill(0)
 		
+		draw_chat()
+		
 		try:
 			for elt in list(boxes.keys()):
 				boxes[elt].show()
@@ -284,8 +332,8 @@ def game():
 		for i in range(len(players.keys()) - 1, -1, -1):
 			players[list(players.keys())[i]].show()
 
-		draw(font.render(str(fps), True, (255,255,255)), (10, 10), centered = False)
-		draw(font.render(players[Name].weapon.name, True, (255,255,255)), (10, 20), centered = False)
+		screen.blit(font.render(str(fps), True, (255,255,255)), (10, 10))
+		screen.blit(font.render(players[Name].weapon.name, True, (255,255,255)), (10, 20))
 
 		pygame.display.update()
 		fps_now += 1
