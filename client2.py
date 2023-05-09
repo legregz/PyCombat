@@ -17,7 +17,7 @@ server.connect((str(sys.argv[1]), int(sys.argv[2])))
 Name = input("entrez votre nom: ")
 Skin = input("entrez votre skin: ")
 
-global players, boxes, messages
+global players, boxes, messages, fps
 players = {}
 boxes = {}
 messages = []
