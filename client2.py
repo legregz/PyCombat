@@ -17,7 +17,7 @@ server.connect((str(sys.argv[1]), int(sys.argv[2])))
 Name = input("entrez votre nom: ")
 Skin = input("entrez votre skin: ")
 
-global players, boxes, messages, fps
+global players, boxes, messages
 players = {}
 boxes = {}
 messages = []
@@ -130,16 +130,6 @@ class Player:
 		
 	def player(self):
 		server.send(bytes(str(["@Player", self.name, self.position, self.life, self.direction, self.skin, self.weapon.name]), "utf-8"))
-class Zone:
-	def __init__(self, name, position, end):
-		self.name = name
-		self.position = position
-		self.end = end
-	def show(self):
-		rect = ()
-		shape_surf = pygame.Surface(pygame.Rect(rect).size, pygame.SRCALPHA)
-  		pygame.draw.rect(shape_surf, color, shape_surf.get_rect())
-    		surface.blit(shape_surf, rect)
 
 class Box:
 	def __init__(self, name, position, end, loot):
@@ -245,24 +235,9 @@ font3 = pygame.font.Font(".PyCombat/LiberationMono-Bold.ttf", 30)
 
 pygame.key.set_repeat(1, 30)
 
-def refresh():
-	screen.fill(0)
+def draw_chat():
 	for i in range(len(messages)):
 		screen.blit(font.render(messages[i], True, (255,255,255)), (lenght, i * 15))
-	
-	for i in list(zones.keys()):
-		zones[i].show()
-	try:
-		for elt in list(boxes.keys()):
-			boxes[elt].show()
-	except:
-		pass
-
-	for i in range(len(players.keys()) - 1, -1, -1):
-		players[list(players.keys())[i]].show()
-
-	screen.blit(font.render(str(fps), True, (255,255,255)), (10, 10))
-	screen.blit(font.render(players[Name].weapon.name, True, (255,255,255)), (10, 20))
 
 def chat():
 	label = font.render(":", True, (255,255,255))
@@ -287,13 +262,13 @@ def chat():
 				if event.key == pygame.K_ESCAPE:
 					return ''
 		
-		refresh()
 		pygame.draw.rect(screen, (25, 25, 25), (lenght, width - 20, 200, 20))
 		text = font.render(user_text, True, (255,255,255))
 		screen.blit(label, (lenght + 2, width - 20))
 		screen.blit(text, (lenght + 10, width - 20))
+		draw_chat()
 		
-		pygame.display.update()
+		pygame.display.flip()
 		time.sleep(0.2)
 
 def menu():
@@ -344,8 +319,23 @@ def game():
 				
 		if move[0] != 0 or move[1] != 0:
 			players[Name].move(move)
-		refresh()
-		pygame.display.flip()
+		screen.fill(0)
+		
+		draw_chat()
+		
+		try:
+			for elt in list(boxes.keys()):
+				boxes[elt].show()
+		except:
+			pass
+		
+		for i in range(len(players.keys()) - 1, -1, -1):
+			players[list(players.keys())[i]].show()
+
+		screen.blit(font.render(str(fps), True, (255,255,255)), (10, 10))
+		screen.blit(font.render(players[Name].weapon.name, True, (255,255,255)), (10, 20))
+
+		pygame.display.update()
 		fps_now += 1
 
 menu()
