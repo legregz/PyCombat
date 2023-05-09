@@ -130,6 +130,10 @@ class Player:
 		
 	def player(self):
 		server.send(bytes(str(["@Player", self.name, self.position, self.life, self.direction, self.skin, self.weapon.name]), "utf-8"))
+class Zone:
+	def __init__(self, name, position):
+		self.name = name
+		self.position = position
 
 class Box:
 	def __init__(self, name, position, end, loot):
@@ -239,6 +243,9 @@ def refresh():
 	screen.fill(0)
 	for i in range(len(messages)):
 		screen.blit(font.render(messages[i], True, (255,255,255)), (lenght, i * 15))
+	
+	for i in list(zones.keys()):
+		zones[i].show()
 	try:
 		for elt in list(boxes.keys()):
 			boxes[elt].show()
