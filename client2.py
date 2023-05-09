@@ -131,9 +131,15 @@ class Player:
 	def player(self):
 		server.send(bytes(str(["@Player", self.name, self.position, self.life, self.direction, self.skin, self.weapon.name]), "utf-8"))
 class Zone:
-	def __init__(self, name, position):
+	def __init__(self, name, position, end):
 		self.name = name
 		self.position = position
+		self.end = end
+	def show(self):
+		rect = ()
+		shape_surf = pygame.Surface(pygame.Rect(rect).size, pygame.SRCALPHA)
+  		pygame.draw.rect(shape_surf, color, shape_surf.get_rect())
+    		surface.blit(shape_surf, rect)
 
 class Box:
 	def __init__(self, name, position, end, loot):
@@ -339,7 +345,7 @@ def game():
 		if move[0] != 0 or move[1] != 0:
 			players[Name].move(move)
 		refresh()
-		pygame.display.update()
+		pygame.display.flip()
 		fps_now += 1
 
 menu()
