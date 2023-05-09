@@ -235,9 +235,21 @@ font3 = pygame.font.Font(".PyCombat/LiberationMono-Bold.ttf", 30)
 
 pygame.key.set_repeat(1, 30)
 
-def draw_chat():
+def refresh():
+	screen.fill(0)
 	for i in range(len(messages)):
 		screen.blit(font.render(messages[i], True, (255,255,255)), (lenght, i * 15))
+	try:
+		for elt in list(boxes.keys()):
+			boxes[elt].show()
+	except:
+		pass
+
+	for i in range(len(players.keys()) - 1, -1, -1):
+		players[list(players.keys())[i]].show()
+
+	screen.blit(font.render(str(fps), True, (255,255,255)), (10, 10))
+	screen.blit(font.render(players[Name].weapon.name, True, (255,255,255)), (10, 20))
 
 def chat():
 	label = font.render(":", True, (255,255,255))
@@ -262,13 +274,13 @@ def chat():
 				if event.key == pygame.K_ESCAPE:
 					return ''
 		
+		refresh()
 		pygame.draw.rect(screen, (25, 25, 25), (lenght, width - 20, 200, 20))
 		text = font.render(user_text, True, (255,255,255))
 		screen.blit(label, (lenght + 2, width - 20))
 		screen.blit(text, (lenght + 10, width - 20))
-		draw_chat()
 		
-		pygame.display.flip()
+		pygame.display.update()
 		time.sleep(0.2)
 
 def menu():
@@ -319,22 +331,7 @@ def game():
 				
 		if move[0] != 0 or move[1] != 0:
 			players[Name].move(move)
-		screen.fill(0)
-		
-		draw_chat()
-		
-		try:
-			for elt in list(boxes.keys()):
-				boxes[elt].show()
-		except:
-			pass
-		
-		for i in range(len(players.keys()) - 1, -1, -1):
-			players[list(players.keys())[i]].show()
-
-		screen.blit(font.render(str(fps), True, (255,255,255)), (10, 10))
-		screen.blit(font.render(players[Name].weapon.name, True, (255,255,255)), (10, 20))
-
+		refresh()
 		pygame.display.update()
 		fps_now += 1
 
