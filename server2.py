@@ -62,6 +62,8 @@ class Client:
 			except:
 				print("Connexion reset by " + addr[0])
 				self.delete(addr[0])
+				self.conn.close()
+				_thread.exit()
 
 			if len(msg) > 0:
 				msgs = separate(msg)
@@ -87,6 +89,8 @@ class Client:
 					
 					elif evaluate_msg[0] == "@Leave":
 						self.delete(evaluate_msg[1])
+						self.conn.close()
+						_thread.exit()
 						
 	def delete(self, name):
 		try:
@@ -94,8 +98,6 @@ class Client:
 			print("Player named " + self.name + " is deleted")
 		except:
 			print("Impossible to delete player called '" + name + "'")
-		self.conn.close()
-		_thread.exit()
 
 def choose(param):
 	items_list = []
@@ -110,14 +112,8 @@ def box_spawn():
 		time.sleep(random.randint(3, 5))
 		broadcast(f"['@Box', {nb}, {[random.randint(4, (lenght-32) // 10), random.randint(4, (width-32) // 10)]}, {time.time() + 10}, '{choose(items)}']", 0)
 		nb += 1
-		
-def zone_spawn():
-	while True:
-		time.sleep(60)
-		broadcast(f"['@Zone', {[random.randint(4, (lenght-32) // 10), random.randint(4, (width-32) // 10)]}, {time.time() + 60}]", 0)
 
 _thread.start_new_thread(box_spawn, ())
-_thread.start_new_thread(zone_spawn, ())
 
 run = True
 while run:
