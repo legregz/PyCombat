@@ -1,6 +1,12 @@
 lenght = 500
 width = 500
 
+def hashing(txt):
+	final = ""
+	for elt in txt:
+		final += str(ord(txt))
+	return final
+
 def separate(msg):
 	msgs = []
 	start = 0
@@ -20,14 +26,32 @@ class Weapon:
 		self.damages = damages
 		self.durability = durability
 		self.probability = probability
+		self.type = "weapon"
+		
+class Care:
+	def __init__(self, name, pvs, durability, probability = 1):
+		self.name = name
+		self.pvs = pvs
+		self.probability = probability
+		self.durability = durability
+		self.type = "care"
 
 def knife():
 	return Weapon('knife', 1, "middle_trace", 8, 2)
 	
 def hand():
-	return Weapon('hand', 0.5, "little_trace", 1000)
+	return Weapon('hand', 0.5, "little_trace", 1)
 	
 def sword():
 	return Weapon('sword', 2, "big_trace", 5, 1)
 	
-items = ["knife", "sword"]
+def medkit():
+	return Care('medkit', 10, 1, 1)
+	
+def bandages():
+	return Care('bandages', 1, 5, 2)
+	
+def hand_care():
+	return Care('hand_care', 0, 1)
+	
+items = ["knife", "sword", "medkit", "bandages"]
