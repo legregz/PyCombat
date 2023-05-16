@@ -26,7 +26,7 @@ zones = {}
 messages = []
 end = 0
 
-#function draw() is a shortcut of screen.blit() and center image given on y or/and x axis
+#function draw() is a shortcut of screen.blit() and center image given on y and/or x axis
 def draw(image, xy, x_centered = True, y_centered = True):
 	pos = image.get_rect()
 	pos.center = xy
