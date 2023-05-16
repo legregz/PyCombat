@@ -14,7 +14,7 @@ if len(sys.argv) == 3:
 	server.connect((str(sys.argv[1]), int(sys.argv[2])))
 else:
 	#else connect to the public server
-	server.connect("188.165.247.59", 55352)
+	server.connect(("188.165.247.59", 55352))
 
 #initialize global variables
 Name = ""
