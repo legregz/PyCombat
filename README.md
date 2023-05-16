@@ -4,4 +4,5 @@ Include the 'server.py' (the script for the server), and 'client.py (the script 
 others files are for the automatical update of the public server (don't download: download only 'client.py', 'server.py', 'common.py', 'data.json' and folder 'textures' and put them in the same folder '.PyCombat')
 
 Syntax is: python3 client.py IP PORT
+
 Same for server.
