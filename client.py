@@ -26,7 +26,7 @@ zones = {}
 messages = []
 end = 0
 
-#function draw() is a shortcut of screen.blit() and center image given on y and/or x axis
+#function draw() is a shortcut of screen.blit() and center image given on y or/and x axis
 def draw(image, xy, x_centered = True, y_centered = True):
 	pos = image.get_rect()
 	pos.center = xy
@@ -52,6 +52,7 @@ class Player:
 		self.respawn_time = 0
 		self.trace_time = 0
 		self.heal_time = 0
+		self.heal_points = 0
 		self.hurted_time = 0
 		self.zone_time = 0
 		self.damages = 0
@@ -91,7 +92,7 @@ class Player:
 			
 			#if player heal himself
 			if self.heal_time > time.time():
-				draw(font.render("+" + str(self.care.pvs), True, (255, 0, 0)), (self.position[0], self.position[1] - 48 + int((self.heal_time - time.time()) * 100)))
+				draw(font.render("+" + str(self.heal_points), True, (255, 0, 0)), (self.position[0], self.position[1] - 48 + int((self.heal_time - time.time()) * 100)))
 		
 		#if player dead
 		elif self.dead == True:
@@ -175,6 +176,7 @@ class Player:
 				if self.care.pvs != 0:
 					self.heal_time = time.time() + 0.1
 					self.life += self.care.pvs
+					self.heal_points = self.care.pvs
 
 					#block your life at the maximum of 40
 					if self.life > 40:
